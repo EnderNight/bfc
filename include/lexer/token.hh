@@ -7,8 +7,6 @@ namespace bfc::lexer
 {
     enum class TokenType
     {
-        TOKEN_EOF,
-        TOKEN_START,
         TOKEN_LEFT_ARROW,
         TOKEN_RIGHT_ARROW,
         TOKEN_PLUS,

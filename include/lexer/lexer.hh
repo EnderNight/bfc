@@ -6,17 +6,6 @@
 
 namespace bfc::lexer
 {
-    class Lexer
-    {
-    public:
-        Lexer();
-
-        Token peek();
-        Token next();
-
-    private:
-        Token cur_tok_;
-    };
 
     std::vector<Token> lex(std::istream& is);
 

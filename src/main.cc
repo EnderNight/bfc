@@ -1,6 +1,9 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <vector>
+
+#include "lexer/lexer.hh"
 #include "lexer/token.hh"
 
 void usage()
@@ -24,20 +27,10 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    std::string line;
-    std::string file;
+    std::vector<bfc::lexer::Token> tokens = bfc::lexer::lex(ifile);
 
-    while (std::getline(ifile, line))
-    {
-        file.append(line);
-    }
-
-    // std::cout << file << std::endl;
-    
-    bfc::lexer::Token token(bfc::lexer::TokenType::TOKEN_DOT, 3);
-
-    std::cout << token << std::endl;
-
+    for (const bfc::lexer::Token& token : tokens)
+        std::cout << token << std::endl;
 
     return 0;
 }

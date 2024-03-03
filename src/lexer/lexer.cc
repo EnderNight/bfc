@@ -1,29 +1,89 @@
 #include "lexer/lexer.hh"
 
+#include <cstddef>
+#include <fstream>
+#include <string>
 #include <vector>
 
 #include "lexer/token.hh"
 
 namespace bfc::lexer
 {
-    Lexer::Lexer()
-        : cur_tok_(Token(TokenType::TOKEN_START, 0))
-    {}
 
-    Token Lexer::peek()
+    size_t get_amount(const std::string& line, size_t& pos)
     {
-        return cur_tok_;
+        char c = line[pos];
+        size_t amount = 0;
+
+        while (pos < line.length() && line[pos] == c)
+        {
+            pos++;
+            amount++;
+        }
+
+        return amount;
     }
 
-    Token Lexer::next()
+    bool is_reserved(char c)
     {
-        return cur_tok_;
+        return c == '+' || c == '-' || c == '>' || c == '<' || c == '.'
+            || c == ',' || c == '[' || c == ']';
     }
 
     std::vector<Token> lex(std::istream& is)
     {
-        (void)is;
         std::vector<Token> res;
+
+        std::string line;
+
+        while (std::getline(is, line))
+        {
+            size_t pos = 0;
+
+            while (pos < line.length())
+            {
+                char c = line[pos];
+                if (is_reserved(c))
+                {
+                    size_t amount = get_amount(line, pos);
+                    TokenType type;
+
+                    switch (c)
+                    {
+                    case '+':
+                        type = TokenType::TOKEN_PLUS;
+                        break;
+                    case '-':
+                        type = TokenType::TOKEN_MINUS;
+                        break;
+                    case '<':
+                        type = TokenType::TOKEN_LEFT_ARROW;
+                        break;
+                    case '>':
+                        type = TokenType::TOKEN_RIGHT_ARROW;
+                        break;
+                    case ']':
+                        type = TokenType::TOKEN_RIGHT_BRACKET;
+                        break;
+                    case '[':
+                        type = TokenType::TOKEN_LEFT_BRACKET;
+                        break;
+                    case '.':
+                        type = TokenType::TOKEN_DOT;
+                        break;
+                    case ',':
+                        type = TokenType::TOKEN_COMA;
+                        break;
+                    }
+
+                    res.push_back(Token(type, amount));
+                }
+                else
+                {
+                    pos++;
+                }
+            }
+        }
 
         return res;
     }

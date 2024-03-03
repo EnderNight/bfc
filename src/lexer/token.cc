@@ -31,12 +31,6 @@ namespace bfc::lexer
     {
         switch (type)
         {
-        case TokenType::TOKEN_START:
-            os << "TOKEN_START";
-            break;
-        case TokenType::TOKEN_EOF:
-            os << "TOKEN_EOF";
-            break;
         case TokenType::TOKEN_LEFT_ARROW:
             os << "TOKEN_LEFT_ARROW";
             break;
