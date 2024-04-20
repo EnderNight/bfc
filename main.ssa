@@ -1,0 +1,130 @@
+# Global variables
+data $ch = { b 0 }
+data $depth = { w 0 }
+
+# Strings
+data $bmis = { b "bfc: bracket mismatch\n", b 0 }
+
+data $prologue = { b "char a[65536], *p=a;\nint\nmain(void)\n{\n", b 0 }
+data $left = { b "p-=1;\n", b 0 }
+data $right = { b "p+=1;\n", b 0 }
+data $dec = { b "*p-=1;\n", b 0 }
+data $inc = { b "*p+=1;\n", b 0 }
+data $gchar = { b "*p=getchar();\n", b 0 }
+data $pchar = { b "putchar(*p);\n", b 0 }
+data $lopen = { b "while(*p){\n", b 0 }
+data $lclose = { b "}\n", b 0 }
+data $epilogue = { b "return 0;\n}\n", b 0 }
+
+function $dputs(l %s, w %fd) {
+@start
+@loop
+    %ch =w loadub %s
+    jnz %ch, @done, @pbyte
+@pbyte
+    storew %ch, $ch
+    call $write(w %fd, l $ch, w 1)
+    %s =l add %s, 1
+    jmp @loop
+@done
+    ret
+}
+
+function $mismatch() {
+@start
+    call $dputs(l $bmis, w 2)
+    call $exit(w 1)
+    ret
+}
+
+function $islopen() {
+@start
+    %d =w loadsw $depth
+    %d =w add %d, 1
+    storew %d, $depth
+    call $dputs(l $lopen, w 1)
+    ret
+}
+
+function $islclose() {
+@start
+    %d =w loadsw $depth
+    %d =w sub %d, 1
+    storew %d, $depth
+    %cmp =w ceqw %d, -1
+    jnz %cmp, @bad, @good
+@bad
+    call $mismatch()
+    ret
+@good
+    call $dputs(l $lclose, w 1)
+    ret
+}
+
+export function w $main() {
+@start
+    call $dputs(l $prologue, w 1)
+@loop
+    %r =w call $read(w 0, l $ch, w 1)
+    %cmp =w ceqw %r, 1
+    jnz %cmp, @maybeleft, @eof
+@maybeleft
+	%b =w loadub $ch		# Bytes must be loaded as words
+	%cmp =w ceqw %b, 60		# <
+	jnz %cmp, @isleft, @mayberight
+@isleft
+	call $dputs(l $left, w 1)
+	jmp @loop
+@mayberight
+	%cmp =w ceqw %b, 62		# >
+	jnz %cmp, @isright, @maybedec
+@isright
+	call $dputs(l $right, w 1)
+	jmp @loop
+@maybedec
+	%cmp =w ceqw %b, 45		# -
+	jnz %cmp, @isdec, @maybeinc
+@isdec
+	call $dputs(l $dec, w 1)
+	jmp @loop
+@maybeinc
+	%cmp =w ceqw %b, 43		# +
+	jnz %cmp, @isinc, @maybegetchar
+@isinc
+	call $dputs(l $inc, w 1)
+	jmp @loop
+@maybegetchar
+	%cmp =w ceqw %b, 44		# ,
+	jnz %cmp, @isgetchar, @maybeputchar
+@isgetchar
+	call $dputs(l $gchar, w 1)
+	jmp @loop
+@maybeputchar
+	%cmp =w ceqw %b, 46		# .
+	jnz %cmp, @isputchar, @maybelopen
+@isputchar
+	call $dputs(l $pchar, w 1)
+	jmp @loop
+@maybelopen
+	%cmp =w ceqw %b, 91		# [
+	jnz %cmp, @islopen, @maybelclose
+@islopen
+	call $islopen()
+	jmp @loop
+@maybelclose
+	%cmp =w ceqw %b, 93		# ]
+	jnz %cmp, @islclose, @loop
+@islclose
+	call $islclose()
+    jmp @loop
+@eof
+    %d =w loadsw $depth
+    jnz %d, @mismatch, @done
+@mismatch
+    call $mismatch()
+    ret 0
+@done
+    call $dputs(l $epilogue, w 1)
+
+    ret 0
+}
