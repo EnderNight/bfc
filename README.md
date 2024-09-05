@@ -1,2 +1,3 @@
 # bfc
-Brainfuck interpreter/compiler
+
+Brainfuck interpreter/compiler.
