@@ -1,10 +1,11 @@
 CC=gcc
-CPPFLAGS=
+CPPFLAGS=-MMD
 CFLAGS=-Wall -Wextra -Wvla -std=c99 -pedantic
 LDFLAGS=
 
-SRC=src/bfc.c
+SRC=src/bfc.c src/token.c src/lexer.c
 OBJ=${SRC:.c=.o}
+DEP=${OBJ:.o=.d}
 
 BIN=bfc
 
@@ -12,7 +13,7 @@ BIN=bfc
 
 all: debug
 
-$(BIN): $(OBJ)
+$(BIN): $(OBJ) $(HDR)
 	$(CC) $(LDFLAGS) -o $@ $^
 
 debug: CFLAGS+=-O0 -ggdb -fsanitize=address
@@ -24,6 +25,8 @@ release: CPPFLAGS+=-DNDEBUG
 release: CFLAGS+=-O3
 release: $(BIN)
 
+-include $(DEP)
+
 
 clean:
-	$(RM) $(OBJ) $(BIN)
+	$(RM) $(OBJ) $(BIN) $(DEP)
