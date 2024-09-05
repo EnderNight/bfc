@@ -1,0 +1,22 @@
+[
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-Wall",
+      "-Wextra",
+      "-Wvla",
+      "-std=c99",
+      "-pedantic",
+      "-O0",
+      "-ggdb",
+      "-fsanitize=address",
+      "-c",
+      "-o",
+      "src/bfc.o",
+      "src/bfc.c"
+    ],
+    "directory": "/home/ender/Projects/bfc",
+    "file": "/home/ender/Projects/bfc/src/bfc.c",
+    "output": "/home/ender/Projects/bfc/src/bfc.o"
+  }
+]
