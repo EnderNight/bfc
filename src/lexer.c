@@ -3,21 +3,22 @@
 #include <stdio.h>
 
 #include "token.h"
+#include "token_da.h"
 
-TokenList* lex(const char* filepath) {
-  TokenList* tokens = token_list_init();
+bool lex(const char* filepath, Token_da* tokens) {
   FILE* program = fopen(filepath, "r");
 
-  if (!program || !tokens) {
+  if (!program) {
     perror("lex");
-    token_list_free(&tokens);
-    return NULL;
+    return false;
   }
 
+  *tokens = Token_da_init();
+  Token_da stack = Token_da_init();
   char c = fgetc(program);
-  char tmp = '\0';
-  Token tok;
+  char tmp;
   size_t amount;
+  Token token, tmp_token;
 
   while (c != EOF) {
     switch (c) {
@@ -33,18 +34,23 @@ TokenList* lex(const char* filepath) {
           amount++;
           tmp = fgetc(program);
         }
+        token = Token_init(c, amount, 0);
+        Token_da_push(tokens, &token);
+
         ungetc(tmp, program);
-        tok = token_init(c, amount, 0);
-        token_list_add(tokens, &tok);
         break;
       case '[':
-        tok = token_init(LBRACK, 1, 0);
-        token_list_add(tokens, &tok);
+        token = Token_init(LBRACK, 1, tokens->length);
+        Token_da_push(tokens, &token);
+        Token_da_push(&stack, &token);
         break;
       case ']':
-        tok = token_init(RBRACK, 1, 0);
-        token_list_add(tokens, &tok);
+        Token_da_pop(&stack, &token);
+        tmp_token = Token_init(RBRACK, 1, token.index);
+        tokens->array[token.index].index = tokens->length;
+        Token_da_push(tokens, &tmp_token);
         break;
+
       default:
         break;
     }
@@ -52,5 +58,7 @@ TokenList* lex(const char* filepath) {
     c = fgetc(program);
   }
 
-  return tokens;
+  Token_da_free(&stack);
+
+  return true;
 }

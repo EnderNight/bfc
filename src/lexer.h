@@ -1,8 +1,10 @@
 #ifndef LEXER_H
 #define LEXER_H
 
-#include "token.h"
+#include <stdbool.h>
 
-TokenList* lex(const char* filepath);
+#include "token_da.h"
+
+bool lex(const char* filepath, Token_da* tokens);
 
 #endif  // !LEXER_H

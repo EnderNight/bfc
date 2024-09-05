@@ -1,22 +1,28 @@
 #include <stdio.h>
 
+#include "executor.h"
 #include "lexer.h"
-#include "token.h"
+#include "token_da.h"
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
   if (argc != 2) {
     fprintf(stderr, "Incorrect number of arguments\n");
-    puts("Usage: bfc <FILE>");
+    fprintf(stderr, "Usage: bfc <FILE>\n");
     return 1;
   }
 
-  TokenList* tokens = lex(argv[1]);
+  Token_da tokens = Token_da_init();
 
-  if (!tokens) return 1;
+  lex(argv[1], &tokens);
 
-  token_list_print(tokens);
+  // for (size_t i = 0; i < tokens.length; i++) {
+  //   Token_print(&tokens.array[i]);
+  //   putchar('\n');
+  // }
 
-  token_list_free(&tokens);
+  execute(&tokens);
+
+  Token_da_free(&tokens);
 
   return 0;
 }

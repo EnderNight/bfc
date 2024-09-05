@@ -3,7 +3,7 @@ CPPFLAGS=-MMD
 CFLAGS=-Wall -Wextra -Wvla -std=c99 -pedantic
 LDFLAGS=
 
-SRC=src/bfc.c src/token.c src/lexer.c
+SRC=src/token.c src/lexer.c src/bfc.c src/token_da.c src/executor.c
 OBJ=${SRC:.c=.o}
 DEP=${OBJ:.o=.d}
 
